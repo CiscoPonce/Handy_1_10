@@ -7,6 +7,9 @@ async function bootstrap() {
     logger: ['error', 'warn', 'log', 'debug', 'verbose']
   });
   
+  // Set global prefix for all routes
+  app.setGlobalPrefix('api');
+  
   // Enable CORS for Android app
   app.enableCors({
     origin: [
