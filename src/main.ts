@@ -43,16 +43,23 @@ async function bootstrap() {
   console.log('Starting application with the following configuration:');
   console.log(`Port: ${port}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Global Prefix: /api`);
+  
+  // Debugging: Log all registered routes
+  const app_ref = app.getHttpAdapter();
+  const server = app_ref.getInstance();
+  
+  if (server && server._router) {
+    console.log('Registered Routes:');
+    server._router.stack.forEach((r) => {
+      if (r.route && r.route.path) {
+        console.log(`${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`);
+      }
+    });
+  }
   
   await app.listen(port, '0.0.0.0', () => {
     console.log(`Application is running on port ${port}`);
-    console.log('Registered routes:');
-    const server = app.getHttpServer();
-    const router = server._events.request._router;
-    console.log(router.stack
-      .filter(r => r.route)
-      .map(r => `${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`)
-    );
   });
 }
 bootstrap();
