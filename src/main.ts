@@ -3,7 +3,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose']
+  });
   
   // Enable CORS for Android app
   app.enableCors({
@@ -17,6 +19,7 @@ async function bootstrap() {
       'capacitor://localhost', // Capacitor default localhost
       'ionic://localhost', // Ionic default localhost
       'http://localhost', // Generic localhost
+      '*' // Temporary: allow all origins for debugging
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -28,13 +31,25 @@ async function bootstrap() {
     transform: true,
     whitelist: true,
     forbidNonWhitelisted: true,
+    disableErrorMessages: false, // Keep error messages for debugging
   }));
   
   // Use PORT from environment or default to 10000
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
   
+  console.log('Starting application with the following configuration:');
+  console.log(`Port: ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  
   await app.listen(port, '0.0.0.0', () => {
     console.log(`Application is running on port ${port}`);
+    console.log('Registered routes:');
+    const server = app.getHttpServer();
+    const router = server._events.request._router;
+    console.log(router.stack
+      .filter(r => r.route)
+      .map(r => `${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`)
+    );
   });
 }
 bootstrap();
