@@ -1,31 +1,41 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Job } from '../jobs/entities/job.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ type: 'varchar', length: 255 })
   name: string;
 
-  @Column({ unique: true, nullable: false })
+  @Column({ type: 'varchar', length: 255, unique: true })
   email: string;
 
-  @Column({ nullable: false, select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   password: string;
 
-  @Column({ nullable: true })
-  phone?: string;
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  phone: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isActive: boolean;
+
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean;
 
   @Column({ nullable: true })
   profilePictureUrl?: string;
 
-  @CreateDateColumn()
+  @OneToMany(() => Job, job => job.customer)
+  jobsCreated: Job[];
+
+  @OneToMany(() => Job, job => job.handyman)
+  jobsAssigned: Job[];
+
+  @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 }
