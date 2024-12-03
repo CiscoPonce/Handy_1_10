@@ -4,13 +4,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { typeOrmConfig } from './config/database.config';
 import { UsersModule } from './users/users.module';
+import { HealthController } from './main';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
     UsersModule
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController],
   providers: [AppService],
   exports: [UsersModule]
 })

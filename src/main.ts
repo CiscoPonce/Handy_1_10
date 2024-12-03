@@ -1,6 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { Controller, Get } from '@nestjs/common';
+
+@Controller('health')
+export class HealthController {
+  @Get()
+  healthCheck() {
+    return {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development'
+    };
+  }
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -37,14 +50,6 @@ async function bootstrap() {
     disableErrorMessages: false, // Keep error messages for debugging
   }));
   
-  // Use PORT from environment or default to 10000
-  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
-  
-  console.log('Starting application with the following configuration:');
-  console.log(`Port: ${port}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`Global Prefix: /api`);
-  
   // Debugging: Log all registered routes
   const app_ref = app.getHttpAdapter();
   const server = app_ref.getInstance();
@@ -57,6 +62,14 @@ async function bootstrap() {
       }
     });
   }
+  
+  // Use PORT from environment or default to 10000
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
+  
+  console.log('Starting application with the following configuration:');
+  console.log(`Port: ${port}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Global Prefix: /api`);
   
   await app.listen(port, '0.0.0.0', () => {
     console.log(`Application is running on port ${port}`);
