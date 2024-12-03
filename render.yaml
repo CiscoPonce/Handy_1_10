@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: handy-backend
+    env: node
+    plan: free
+    branch: main
+    repo: https://github.com/CiscoPonce/Handy_1_10.git
+    runtime: nodejs
+    nodeVersion: 18.x
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+    healthCheckPath: /
+    healthCheckTimeout: 100
+    autoDeploy: true
+    numInstances: 1
+    publishPath: dist
