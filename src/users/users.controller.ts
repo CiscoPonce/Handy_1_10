@@ -13,7 +13,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
-@Controller('api/users')
+@Controller('users')
 export class UsersController {
   private readonly logger = new Logger(UsersController.name);
 
