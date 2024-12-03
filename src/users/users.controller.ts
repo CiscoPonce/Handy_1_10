@@ -10,14 +10,14 @@ import {
   Request 
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from './user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async createUser(@Body() userData: Partial<User>) {
+  async createUser(@Body() userData: CreateUserDto) {
     return this.usersService.createUser(userData);
   }
 
@@ -29,7 +29,7 @@ export class UsersController {
   @Put(':id')
   async updateUser(
     @Param('id') id: string, 
-    @Body() updateData: Partial<User>
+    @Body() updateData: Partial<CreateUserDto>
   ) {
     return this.usersService.updateUser(id, updateData);
   }

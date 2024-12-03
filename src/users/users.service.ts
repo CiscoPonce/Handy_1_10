@@ -2,6 +2,7 @@ import { Injectable, ConflictException, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -11,7 +12,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async createUser(userData: Partial<User>): Promise<User> {
+  async createUser(userData: CreateUserDto): Promise<User> {
     // Check if user already exists
     const existingUser = await this.usersRepository.findOne({ 
       where: { email: userData.email } 
@@ -22,13 +23,15 @@ export class UsersService {
     }
 
     // Hash password
-    if (userData.password) {
-      const salt = await bcrypt.genSalt(10);
-      userData.password = await bcrypt.hash(userData.password, salt);
-    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(userData.password, salt);
 
     // Create and save new user
-    const user = this.usersRepository.create(userData);
+    const user = this.usersRepository.create({
+      ...userData,
+      password: hashedPassword,
+      isActive: true
+    });
     return this.usersRepository.save(user);
   }
 
@@ -40,7 +43,7 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { id } });
   }
 
-  async updateUser(id: string, updateData: Partial<User>): Promise<User> {
+  async updateUser(id: string, updateData: Partial<CreateUserDto>): Promise<User> {
     const user = await this.findUserById(id);
     
     if (!user) {
